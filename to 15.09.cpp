@@ -4,51 +4,49 @@
 
 void Split(char* astring, char* delimiters, char*** tokens, int* tokensCount)
 {
-	char *p;
-	int i = 0;
-	p = strtok(astring, delimiters);
+    char * wordPointer;
+    int i = 0;
+    wordPointer = strtok(astring, delimiters);
   /*
-   * FIXIT: С„РѕСЂРјР°С‚РёСЂРѕРІР°РЅРёРµ: РїСЂРѕР±РµР»С‹ РІРѕРєСЂСѓРі Р±РёРЅР°СЂРЅС‹С… РѕРїРµСЂР°С†РёР№.
-   * РЎС‚Р°СЂР°Р№С‚РµСЃСЊ РЅР°Р·С‹РІР°С‚СЊ РїРµСЂРµРјРµРЅРЅС‹Рµ Р±РѕР»РµРµ РѕСЃРјС‹СЃР»РµРЅРЅРѕ: РµСЃР»Рё РІРјРµСЃС‚Рѕ char* p; РјРѕР¶РЅРѕ РЅР°РїРёСЃР°С‚СЊ char* token;
+   * FIXIT: форматирование: пробелы вокруг бинарных операций.
+   * Старайтесь называть переменные более осмысленно: если вместо char* p; можно написать char* token;
    */
-	*tokens = (char**)malloc(100*sizeof(char*));
-	while (p != NULL)
-	{
-		(*tokens)[i] = p;
-		i++;
-		p = strtok(NULL, delimiters);
-	}
-	*tokensCount = i;
+    while (wordPointer != NULL)
+    {
+        (*tokens)[i] = wordPointer;
+        i++;
+        wordPointer = strtok(NULL, delimiters);
+    }
+    *tokensCount = i;
 }
 
 int main()
 {
-	char s[] = "asdasd     asdahsd         asduyiasd           dfghfgh          jhhjjh";
-	char *p;
-	char delim[] = " ";
-	int *tcount, a, i;
+    char s[] = "asdasd     asdahsd         asduyiasd           dfghfgh          jhhjjh";
+    char delim[] = " ";
+    int tokensCount;
   /*
-   * Р—Р°С‡РµРј СЌС‚Рѕ РєСЂСѓС‡РµРЅРёРµ-РІРµСЂС‡РµРЅРёРµ СѓРєР°Р·Р°С‚РµР»РµР№: СѓР±РµСЂРёС‚Рµ РІСЃРµ Р»РёС€РЅРёРµ РїРµСЂРµРјРµРЅРЅС‹Рµ.
+   * Зачем это кручение-верчение указателей: уберите все лишние переменные.
    * int tokensCount;
    * char** tokens;
    * tokens = (char**)malloc...
    * Split(s, delims, &tokens, &tokensCount);
    */
-	tcount = &a;
-	char *** tok;
+    char ** tokens;
   /*
-   * 1. РЈ РІР°СЃ РІ РЅРµРєРѕС‚РѕСЂС‹С… РјРµСЃС‚Р°С… РѕС‚СЃС‚СѓРїС‹ СЃРґРµР»Р°РЅС‹ РїСЂРѕР±РµР»Р°РјРё, Р° РіРґРµ-С‚Рѕ СЃРёРјРІРѕР»Р°РјРё С‚Р°Р±СѓР»СЏС†РёРё.
-   * РЈ РјРµРЅСЏ С„РѕСЂРјР°С‚РёСЂРѕРІР°РЅРёРµ РїРѕРµС…Р°Р»Рѕ РёР·-Р·Р° СЌС‚РѕРіРѕ. 
-   * 2. РџР°РјСЏС‚СЊ РЅР°РґРѕ РІС‹РґРµР»СЏС‚СЊ РІ С‚РѕРј Р¶Рµ РјРµСЃС‚Рµ, РіРґРµ РІС‹ РµС‘ РѕСЃРІРѕР±РѕР¶РґР°РµС‚Рµ. Рў.Рє. РІРЅСѓС‚СЂРё С„-Рё split РІС‹ РµС‘ РѕСЃРІРѕР±РѕРґРёС‚СЊ РЅРµ РјРѕР¶РµС‚Рµ, С‚Рѕ Рё РІС‹РґРµР»РёС‚СЊ РµС‘ РЅР°РґРѕ РІ main`Рµ.
-   * 3. tokk - РїР»РѕС…РѕРµ, РЅРµ РІРЅРѕСЃСЏС‰РёРµ РЅРёРєР°РєРѕР№ СЏСЃРЅРѕСЃС‚Рё РЅР°Р·РІР°РЅРёРµ. Р±СѓРґС‚Рѕ РїРѕРЅСЏС‚РЅС‹Рµ СЃР»РѕРІР° РєРѕРЅС‡РёР»РёСЃСЊ.
-   * 4. РЅР°РґРѕ РѕСЃРІРѕР±РѕРґРёС‚СЊ РїР°РјСЏС‚СЊ.
+   * 1. У вас в некоторых местах отступы сделаны пробелами, а где-то символами табуляции.
+   * У меня форматирование поехало из-за этого.
+   * 2. Память надо выделять в том же месте, где вы её освобождаете. Т.к. внутри ф-и split вы её освободить не можете, то и выделить её надо в main`е.
+   * 3. tokk - плохое, не вносящие никакой ясности название. будто понятные слова кончились.
+   * 4. надо освободить память.
    */
-    char ** tokk;
-    tok = &tokk;
-    Split(s, delim, tok, tcount);
-    for (i = 0; i < a; i++)
-        printf("%s\n", tokk[i]);
-	return 0;
+    tokens = (char**)malloc(100 * sizeof(char*));
+    Split(s, delim, &tokens, &tokensCount);
+    for (int i = 0; i < tokensCount; i++)
+        printf("%s\n", tokens[i]);
+    printf("String contains %d word(s).", tokensCount);
+    free(tokens);
+    return 0;
 }
 
 
