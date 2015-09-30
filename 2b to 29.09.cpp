@@ -14,10 +14,13 @@ int main()
         i++;
         if ((i == n) && (pid == 0))         //last child mustn't print 'status'
             exit(0);
-        if (pid > 0)
+        if (pid > 0) {
+            printf("%d\n", pid);
             break;
+        }
     }
-    wait(&status);
-    printf("\n%d", status);
+    int pid;
+    pid = wait(&status);
+    printf("%d %d\n", pid, status >> 8);
     return 0;
 }
