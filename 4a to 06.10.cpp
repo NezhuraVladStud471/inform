@@ -3,11 +3,19 @@
 #include <stdlib.h>
 #include <time.h>
 
+/*
+ * FIXIT:
+ * 100 нужно вынести в отдельную константу.
+ */
+
 int n, msize, m1[100][100], m2[100][100], result[100][100];
 
 void* func(void* x)
 {
     int startpoint = *((int*)x);
+    /*
+     * Обычно в подобных ситуация индексы называют i,j,k. 
+     */
     for (int k = 0; k < msize / n; k++)
         for (int e = 0; e < msize; e++)
             for (int t = 0; t < msize; t++)
@@ -31,6 +39,10 @@ int main()
             m2[i][j] = rand() % 100;
         }
     pthread_t* thrid;
+    /*
+     * Странно, что вы веделили массив размером (100 * 4 байта) в куче, а двумерный массив из 10000 элементов - на стеке.
+     * Его, вероятно, лучше тогда тоже было бы выделить в куче.
+     */
     thrid = (pthread_t*)malloc(n * sizeof(pthread_t));
     int thrnum[100];
     thrnum[0] = 0;

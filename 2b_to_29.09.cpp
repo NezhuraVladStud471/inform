@@ -4,6 +4,9 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+/*test test test
+ */
+
 int main()
 {
     int status, n, i = 0;
