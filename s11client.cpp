@@ -39,9 +39,15 @@ int main(int argc, char** argv)
         {
             printf("Enter nickname:\n");
             fgets(sendline, 1111, stdin);
-            int l = strlen(sendline);
-            strncpy(sendline, sendline, l - 2);         //i have no idea what to do with '\n' in the end of sendline
-            strcat(sendline, ":");
+            /*
+	     * Ник видимо следует вводить только один раз при запуске клиента.
+	     */
+	    int l = strlen(sendline);
+            strncpy(sendline, sendline, l + 1);         //i have no idea what to do with '\n' in the end of sendline
+            /*
+	     * Мне кажется sendline[l] = '\0'; должно помочь.
+	     */
+	    strcat(sendline, ":");
             fgets(line, 1111, stdin);
             strncat(sendline, line, 1111);
             if (sendto(sockfd, sendline, strlen(sendline) + 1, 0, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0)

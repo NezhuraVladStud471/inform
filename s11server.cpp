@@ -27,6 +27,10 @@ int main()
         for (int i = 0; i <= users; i++)
         {
             //printf("%d\n", userid[i]);
+	    /*
+	     * у вас users - число пользователей, и вы обращаетесь к элементу, которого заведомо нет +
+	     * неплохо бы ещё и ip проверять
+	     */
             if (userid[i] == cliaddr.sin_port) break;
             if (i == users)
             {   
@@ -37,8 +41,11 @@ int main()
         }
         for (int i = 0; i < users; i++)
         {
+	    /*
+	     * Желательно отправлять всем, кроме автора сообщения.
+	     */
             cliaddr.sin_port = userid[i];
-            sendto(sockfd, line, strlen(line), 0, (struct sockaddr*)&cliaddr, clilen);
+            sendto(sockfd, line, strlen(line) + 1, 0, (struct sockaddr*)&cliaddr, clilen);
         }
     }
     return 0;
