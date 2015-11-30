@@ -50,9 +50,9 @@ int main(int argc, char** argv)
             /*
 	     * Мне кажется sendline[l] = '\0'; должно помочь.
 	     */
-	        bzero(sendline, 1111);
-	        strcat(sendline, nickname);
-	        strcat(sendline, ":");
+	    bzero(sendline, 1111);
+	    strcat(sendline, nickname);
+	    strcat(sendline, ":");
             fgets(line, 1111, stdin);
             strncat(sendline, line, 1111);
             if (sendto(sockfd, sendline, strlen(sendline) + 1, 0, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0)
