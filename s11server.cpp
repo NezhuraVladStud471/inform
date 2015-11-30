@@ -12,7 +12,7 @@ int main()
 {
     int sockfd = socket(PF_INET, SOCK_DGRAM, 0);
     int users = 0;
-    unsigned short userid[100];
+    unsigned short sender, userid[100];
     struct sockaddr_in servaddr, cliaddr;
     bzero(&servaddr, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
@@ -24,11 +24,11 @@ int main()
     while (1)
     {
         recvfrom(sockfd, line, 1110, 0, (struct sockaddr*)&cliaddr, &clilen);
+        sender = cliaddr.sin_port;
         for (int i = 0; i <= users; i++)
         {
-            //printf("%d\n", userid[i]);
 	    /*
-	     * у вас users - число пользователей, и вы обращаетесь к элементу, которого заведомо нет +
+	     * у вас users - число пользователей, и вы обращаетесь к элементу, которого заведомо нет (?) +
 	     * неплохо бы ещё и ip проверять
 	     */
             if (userid[i] == cliaddr.sin_port) break;
@@ -42,8 +42,9 @@ int main()
         for (int i = 0; i < users; i++)
         {
 	    /*
-	     * Желательно отправлять всем, кроме автора сообщения.
+	     * Желательно отправлять всем, кроме автора сообщения. //done
 	     */
+            if (sender == userid[i]) continue;
             cliaddr.sin_port = userid[i];
             sendto(sockfd, line, strlen(line) + 1, 0, (struct sockaddr*)&cliaddr, clilen);
         }

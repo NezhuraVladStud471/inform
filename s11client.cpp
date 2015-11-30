@@ -31,23 +31,28 @@ int main(int argc, char** argv)
         close(sockfd);
         return 0;
     }
-    char sendline[1111], recvline[1111], line[1111];
+    char sendline[1111], recvline[1111], line[1111], nickname[1111];
+    bzero(recvline, 1111);
+    bzero(line, 1111);
+    bzero(nickname, 1111);
+    printf("Enter nickname:\n");
+    fgets(nickname, 1111, stdin);
+    int l = strlen(nickname);
+    nickname[l - 1] = '\0';
     pid_t pid = fork();
     if (pid == 0)
     {
         while (1)
         {
-            printf("Enter nickname:\n");
-            fgets(sendline, 1111, stdin);
             /*
 	     * Ник видимо следует вводить только один раз при запуске клиента.
 	     */
-	    int l = strlen(sendline);
-            strncpy(sendline, sendline, l + 1);         //i have no idea what to do with '\n' in the end of sendline
             /*
 	     * Мне кажется sendline[l] = '\0'; должно помочь.
 	     */
-	    strcat(sendline, ":");
+	        bzero(sendline, 1111);
+	        strcat(sendline, nickname);
+	        strcat(sendline, ":");
             fgets(line, 1111, stdin);
             strncat(sendline, line, 1111);
             if (sendto(sockfd, sendline, strlen(sendline) + 1, 0, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0)
