@@ -11,6 +11,13 @@
 #include <errno.h>
 #include <fcntl.h>
 
+/*
+ * Если часто перезапускать программу, то на вызове bind будет ошибка.
+ * Нужно подождать секунд 10 и можно заново запускать.
+ * Мне кажется вы уже близки к рабочему варианту.
+ * Какая-то проблема с разделяемой памятью. Поразбирайтесь.
+ */
+
 int main()
 {
     int sockfd = socket(PF_INET, SOCK_STREAM, 0);
@@ -29,24 +36,37 @@ int main()
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(49999);
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
-    listen(sockfd, 2);
+    if (bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) != 0)
+    {
+      perror("can`t bind:");
+      exit(1);
+    }
+    if (listen(sockfd, 5) != 0)
+    {
+      perror("listen:");
+      exit(0);
+    }
     unsigned int clilen = sizeof(cliaddr);
     while (1)
     {
+	printf("step1\n");
         newsockfd[*usersptr] = accept(sockfd, (struct sockaddr *)&cliaddr, &clilen);
+	printf("step2\n");
         (*usersptr)++;
         pid_t pid = fork();
         if (pid > 0)
         {
+	    printf("step3\n");
             usersptr = (int*)shmat(shmid, 0, 0);
             newsockfd = (int*)(usersptr + 1);
             int currentuser = (*usersptr) - 1;
+	    printf("currentuser %d; usersCount %d\n", currentuser, usersptr[0]);
             while(1)
             {
                 read(newsockfd[currentuser], line, 999);
                 for (int i = 0; i < (*usersptr); i++)
                 {
+		    printf("client socket addr %d\n", newsockfd[i]);
                     write(newsockfd[i], line, strlen(line) + 1);
                 }
             }
