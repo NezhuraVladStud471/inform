@@ -32,7 +32,7 @@ void * newuser(void * x)
         read(newsockfd[currentuser], line, 999);
         for (int i = 0; i < (*usersptr); i++)
         {
-            write(newsockfd[i], line, strlen(line) + 1);
+            if (i != currentuser) write(newsockfd[i], line, strlen(line) + 1);
         }
     }
 }
