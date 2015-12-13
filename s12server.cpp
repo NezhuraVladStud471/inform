@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <pthread.h>
 
 /*
  * Если часто перезапускать программу, то на вызове bind будет ошибка.
@@ -17,6 +18,24 @@
  * Мне кажется вы уже близки к рабочему варианту.
  * Какая-то проблема с разделяемой памятью. Поразбирайтесь.
  */
+
+void * newuser(void * x)
+{
+    int shmid = *(int*)x;
+    int * usersptr = (int*)shmat(shmid, 0, 0);
+    int * newsockfd = (int*)(usersptr + 1);
+    int currentuser = (*usersptr) - 1;
+    char line[1000];
+    bzero(line, 1000);
+    while(1)
+    {
+        read(newsockfd[currentuser], line, 999);
+        for (int i = 0; i < (*usersptr); i++)
+        {
+            write(newsockfd[i], line, strlen(line) + 1);
+        }
+    }
+}
 
 int main()
 {
@@ -28,8 +47,6 @@ int main()
     int shmid = shmget(key, (101 * sizeof(int)), 0666 | IPC_CREAT);
     usersptr = (int*)shmat(shmid, 0, 0);
     newsockfd = (int*)(usersptr + 1);
-    char line[1000];
-    bzero(line, 1000);
     (*usersptr) = 0;
     struct sockaddr_in servaddr, cliaddr;
     bzero(&servaddr, sizeof(servaddr));
@@ -49,27 +66,9 @@ int main()
     unsigned int clilen = sizeof(cliaddr);
     while (1)
     {
-	printf("step1\n");
         newsockfd[*usersptr] = accept(sockfd, (struct sockaddr *)&cliaddr, &clilen);
-	printf("step2\n");
         (*usersptr)++;
-        pid_t pid = fork();
-        if (pid > 0)
-        {
-	    printf("step3\n");
-            usersptr = (int*)shmat(shmid, 0, 0);
-            newsockfd = (int*)(usersptr + 1);
-            int currentuser = (*usersptr) - 1;
-	    printf("currentuser %d; usersCount %d\n", currentuser, usersptr[0]);
-            while(1)
-            {
-                read(newsockfd[currentuser], line, 999);
-                for (int i = 0; i < (*usersptr); i++)
-                {
-		    printf("client socket addr %d\n", newsockfd[i]);
-                    write(newsockfd[i], line, strlen(line) + 1);
-                }
-            }
-        }
+        pthread_t thrid;
+        pthread_create(&thrid, 0, newuser, &shmid);
     }
 }
